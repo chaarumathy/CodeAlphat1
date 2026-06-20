@@ -1,0 +1,1 @@
+const API_URL = "http://localhost:4848/api/v3";

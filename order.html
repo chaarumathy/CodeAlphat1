@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - NatiMart</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .orders-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .orders-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .orders-header h1 {
+            font-size: 2rem;
+            color: var(--text-color);
+        }
+
+        .orders-header p {
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-top: 0.5rem;
+        }
+
+        /* Order Tabs */
+        .order-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .order-tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .order-tab:hover {
+            background: var(--search-bg);
+        }
+
+        .order-tab.active {
+            color: var(--primary-color);
+        }
+
+        .order-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-color);
+        }
+
+        /* Order Card */
+        .order-card {
+            background: var(--bg-color);
+            border-radius: 16px;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: var(--search-bg);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .order-info {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .order-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .order-info-item i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+        .order-info-item span:first-child {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .order-info-item span:last-child {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .order-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-processing {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .status-shipped {
+            background: #e0e7ff;
+            color: #4f46e5;
+        }
+
+        .status-delivered {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .order-body {
+            padding: 1.5rem;
+        }
+
+        .order-items {
+            margin-bottom: 1.5rem;
+        }
+
+        .order-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-item-image {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+            background: var(--search-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .order-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .order-item-details {
+            flex: 2;
+        }
+
+        .order-item-details h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-color);
+        }
+
+        .order-item-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .order-item-price {
+            text-align: right;
+            min-width: 100px;
+        }
+
+        .order-item-price .price {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        .order-item-price .quantity {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: var(--search-bg);
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .order-total {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+
+        .order-total span:first-child {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .order-total span:last-child {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: var(--search-bg);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #2d3a4e;
+            transform: translateY(-2px);
+        }
+
+        .empty-orders {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--bg-color);
+            border-radius: 16px;
+        }
+
+        .empty-orders i {
+            font-size: 4rem;
+            color: var(--text-color);
+            opacity: 0.5;
+            margin-bottom: 1rem;
+        }
+
+        .empty-orders h3 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-orders p {
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .shop-now-btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .shop-now-btn:hover {
+            background: #2d3a4e;
+            transform: translateY(-2px);
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 4rem;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .orders-container {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+
+            .orders-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .order-info {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .order-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .order-item-image {
+                width: 100px;
+                height: 100px;
+                margin: 0 auto;
+            }
+
+            .order-item-price {
+                text-align: center;
+            }
+
+            .order-footer {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .order-tabs {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="navbar">
+            <a href="index.html" class="nav-logo">NatiMart</a>
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="shop.html" class="nav-link">
+                        Shop <i class="fa-solid fa-chevron-down fa-xs"></i>
+                    </a>
+                    <div class="mega-menu">
+                        <div class="mega-menu-grid" id="megaMenu">
+                            <div class="mega-menu-column">
+                                <h3>Men</h3>
+                                <ul>
+                                    <li><a href="shop.html?gender=Men&category=T-shirts">T-Shirts</a></li>
+                                    <li><a href="shop.html?gender=Men&category=shirts">Shirts</a></li>
+                                    <li><a href="shop.html?gender=Men&category=jeans">Jeans & Trousers</a></li>
+                                    <li><a href="shop.html?gender=Men&category=footwear">Footwear</a></li>
+                                </ul>
+                            </div>
+                            <div class="mega-menu-column">
+                                <h3>Women</h3>
+                                <ul>
+                                    <li><a href="shop.html?gender=Women&category=T-shirts">T-Shirts</a></li>
+                                    <li><a href="shop.html?gender=Women&category=shirts">Shirts</a></li>
+                                    <li><a href="shop.html?gender=Women&category=jeans">Jeans & Trousers</a></li>
+                                    <li><a href="shop.html?gender=Women&category=footwear">Footwear</a></li>
+                                </ul>
+                            </div>
+                            <div class="mega-menu-column">
+                                <h3>Children</h3>
+                                <ul>
+                                    <li><a href="shop.html?gender=Children&category=T-shirts">T-Shirts</a></li>
+                                    <li><a href="shop.html?gender=Children&category=shirts">Shirts</a></li>
+                                    <li><a href="shop.html?gender=Children&category=jeans">Jeans & Trousers</a></li>
+                                    <li><a href="shop.html?gender=Children&category=footwear">Footwear</a></li>
+                                </ul>
+                            </div>
+                            <div class="mega-menu-column">
+                                <h3>Accessories</h3>
+                                <ul>
+                                    <li><a href="shop.html?gender=Men&category=Accessories">Men's Accessories</a></li>
+                                    <li><a href="shop.html?gender=Women&category=Accessories">Women's Accessories</a></li>
+                                </ul>
+                            </div>
+                            <div class="mega-menu-promo">
+                                <img src="https://c8.alamy.com/comp/2G4C410/summer-sale-banner-template-design-vector-illustration-for-seasonal-offer-promotion-advertising-2G4C410.jpg" alt="seasonal sale">
+                                <div class="mega-menu-promo-content">
+                                    <h4>End of Season Sale</h4>
+                                    <p>Up to 50% off on selected items.</p>
+                                    <a href="shop.html" class="promo-btn">Shop Now <i class="fa-solid fa-arrow-right fa-xs"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="about.html" class="nav-link">About us</a>
+                </li>
+                <li class="nav-item">
+                    <a href="contact.html" class="nav-link">Contact us</a>
+                </li>
+                <li class="nav-item">
+                    <form action="shop.html" method="GET">
+                        <input type="text" id="searchInput" name="search" placeholder="Search..." />
+                        <button class="btn" type="submit">Search</button>
+                    </form>
+                </li>
+                <li class="nav-item">
+                    <button class="btn" id="loginBtn" onclick="openAuthModal()">Login</button>
+                </li>
+                <li class="profile-dropdown profileDropdown" id="profileDropdown" style="display: none;">
+                    <button class="btn profile-btn" id="profileSection">A</button>
+                    <div id="dropdownMenu" class="dropdown-content"></div>
+                </li>
+                <li class="nav-item">
+                    <a href="cart.html" class="cart">
+                        <span id="cartCountItems" class="cart-count">0</span>
+                        <i class="fa-solid fa-cart-plus"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <div class="dark-toggle" id="dark-toggle">☀️</div>
+                </li>
+            </ul>
+            <button class="menu-btn" id="menu-btn"><i class="fa-solid fa-bars"></i></button>
+        </nav>
+    </header>
+
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-header">
+            <a href="index.html" class="nav-logo">NatiMart</a>
+            <button class="close-btn" id="close-btn">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <input type="text" class="mobile-search" placeholder="Search..." />
+        <ul class="mobile-nav-links">
+            <li class="mobile-nav-item">
+                <a href="index.html" class="mobile-nav-link">Home</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="shop.html" class="mobile-nav-link" id="mobile-shop-link">Shop <i class="fa-solid fa-chevron-down fa-xs" id="shop-chevron"></i></a>
+                <div class="mobile-mega-menu" id="mobile-mega-menu">
+                    <div class="mobile-mega-menu-column">
+                        <h4>Men</h4>
+                        <ul>
+                            <li><a href="shop.html?gender=Men&category=shirts">Shirts</a></li>
+                            <li><a href="shop.html?gender=Men&category=jeans">Jeans & Trousers</a></li>
+                            <li><a href="shop.html?gender=Men&category=footwear">Footwear</a></li>
+                        </ul>
+                    </div>
+                    <div class="mobile-mega-menu-column">
+                        <h3>Women</h3>
+                        <ul>
+                            <li><a href="shop.html?gender=Women&category=shirts">Shirts</a></li>
+                            <li><a href="shop.html?gender=Women&category=jeans">Jeans & Trousers</a></li>
+                            <li><a href="shop.html?gender=Women&category=footwear">Footwear</a></li>
+                        </ul>
+                    </div>
+                    <div class="mobile-mega-menu-column">
+                        <h3>Childrens</h3>
+                        <ul>
+                            <li><a href="shop.html?gender=Children&category=shirts">Shirts</a></li>
+                            <li><a href="shop.html?gender=Children&category=jeans">Jeans & Trousers</a></li>
+                            <li><a href="shop.html?gender=Children&category=footwear">Footwear</a></li>
+                        </ul>
+                    </div>
+                    <div class="mobile-mega-menu-column">
+                        <h3>Accessories</h3>
+                        <ul>
+                            <li><a href="shop.html?gender=Men&category=Accessories">Men's Accessories</a></li>
+                            <li><a href="shop.html?gender=Women&category=Accessories">Women's Accessories</a></li>
+                        </ul>
+                    </div>
+                    <div class="mega-menu-promo">
+                        <img src="https://c8.alamy.com/comp/2G4C410/summer-sale-banner-template-design-vector-illustration-for-seasonal-offer-promotion-advertising-2G4C410.jpg" alt="seasonal sale">
+                        <div class="mega-menu-promo-content">
+                            <h4>End of Season Sale</h4>
+                            <p>Up to 50% off on selected items.</p>
+                            <a href="shop.html" class="promo-btn">Shop Now <i class="fa-solid fa-arrow-right fa-xs"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="about.html" class="mobile-nav-link">About</a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="contact.html" class="mobile-nav-link">Contact</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="menu_overlay" id="menu_overlay"></div>
+
+    <div class="orders-container">
+        <div class="orders-header">
+            <h1>My Orders</h1>
+            <p>Track and manage your orders</p>
+        </div>
+
+        <div class="order-tabs">
+            <button class="order-tab active" data-status="all">All Orders</button>
+            <button class="order-tab" data-status="pending">Pending</button>
+            <button class="order-tab" data-status="processing">Processing</button>
+            <button class="order-tab" data-status="shipped">Shipped</button>
+            <button class="order-tab" data-status="delivered">Delivered</button>
+            <button class="order-tab" data-status="cancelled">Cancelled</button>
+        </div>
+
+        <div id="ordersList"></div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>NatiMart</h4>
+                <p>your one step destination for the latest trends in fashion & accessories. Quality and style delivered to your doorstep.</p>
+                <div class="social-icons">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Tiktok"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="shop.html?gender=Men">Men's Collection</a></li>
+                    <li><a href="shop.html?gender=Women">Women's Fashion</a></li>
+                    <li><a href="shop.html?category=Cosmotics">Cosmotics & Beauty</a></li>
+                    <li><a href="#">New Arrivals</a></li>
+                    <li><a href="#">Sale & Offers</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Shipping & Return</a></li>
+                    <li><a href="#">Track Your Order</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Stay Updated</h4>
+                <p>Subscribe to our newsletter for the latest updates & offers.</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Your email Address" required />
+                    <button type="submit">Go</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 NatiMart. All Rights Reserved.</p>
+            <div class="payment-icons">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-cc-paypal"></i>
+                <i class="fab fa-cc-amex"></i>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ordersList = document.getElementById('ordersList');
+            let currentFilter = 'all';
+
+            let orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+            if (orders.length === 0) {
+                orders = [
+                    {
+                        id: 'ORD-001',
+                        orderId: 'ORD-1703123456789',
+                        date: '2024-03-15T10:30:00.000Z',
+                        status: 'delivered',
+                        total: 129.97,
+                        paymentMethod: 'card',
+                        items: [
+                            { name: 'Premium Cotton T-Shirt', quantity: 2, price: 29.99, image: 'https://images.pexels.com/photos/428340/pexels-photo-428340.jpeg?auto=compress&cs=tinysrgb&w=100', size: 'M', color: 'Blue' },
+                            { name: 'Men Slim Fit Jeans', quantity: 1, price: 69.99, image: 'https://images.pexels.com/photos/1598507/pexels-photo-1598507.jpeg?auto=compress&cs=tinysrgb&w=100', size: '32', color: 'Blue' }
+                        ],
+                        shippingAddress: {
+                            fullName: 'John Doe',
+                            address: '123 Main Street',
+                            city: 'Addis Ababa',
+                            state: 'Ethiopia',
+                            postalCode: '1000'
+                        }
+                    },
+                    {
+                        id: 'ORD-002',
+                        orderId: 'ORD-1703123456790',
+                        date: '2024-03-20T14:45:00.000Z',
+                        status: 'shipped',
+                        total: 89.98,
+                        paymentMethod: 'cod',
+                        items: [
+                            { name: "Women's Summer Floral Dress", quantity: 1, price: 59.99, image: 'https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=100', size: 'M', color: 'Pink' },
+                            { name: 'Women Leather Handbag', quantity: 1, price: 29.99, image: 'https://images.pexels.com/photos/1152077/pexels-photo-1152077.jpeg?auto=compress&cs=tinysrgb&w=100', color: 'Brown' }
+                        ],
+                        shippingAddress: {
+                            fullName: 'John Doe',
+                            address: '123 Main Street',
+                            city: 'Addis Ababa',
+                            state: 'Ethiopia',
+                            postalCode: '1000'
+                        }
+                    },
+                    {
+                        id: 'ORD-003',
+                        orderId: 'ORD-1703123456791',
+                        date: '2024-04-01T09:15:00.000Z',
+                        status: 'pending',
+                        total: 49.99,
+                        paymentMethod: 'card',
+                        items: [
+                            { name: "Men's Formal Shirt", quantity: 1, price: 49.99, image: 'https://images.pexels.com/photos/7674508/pexels-photo-7674508.jpeg?auto=compress&cs=tinysrgb&w=100', size: 'L', color: 'White' }
+                        ],
+                        shippingAddress: {
+                            fullName: 'John Doe',
+                            address: '123 Main Street',
+                            city: 'Addis Ababa',
+                            state: 'Ethiopia',
+                            postalCode: '1000'
+                        }
+                    }
+                ];
+                localStorage.setItem('orders', JSON.stringify(orders));
+            }
+
+            function updateCartCount() {
+                const cartCountItems = document.getElementById('cartCountItems');
+                if (cartCountItems) {
+                    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                    cartCountItems.textContent = totalItems;
+                }
+            }
+            updateCartCount();
+
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+
+            function getStatusClass(status) {
+                switch(status) {
+                    case 'pending': return 'status-pending';
+                    case 'processing': return 'status-processing';
+                    case 'shipped': return 'status-shipped';
+                    case 'delivered': return 'status-delivered';
+                    case 'cancelled': return 'status-cancelled';
+                    default: return 'status-pending';
+                }
+            }
+
+            // Render orders
+            function renderOrders() {
+                if (!ordersList) return;
+
+                let filteredOrders = orders;
+                if (currentFilter !== 'all') {
+                    filteredOrders = orders.filter(order => order.status === currentFilter);
+                }
+
+                if (filteredOrders.length === 0) {
+                    ordersList.innerHTML = `
+                        <div class="empty-orders">
+                            <i class="fa-solid fa-box-open"></i>
+                            <h3>No Orders Found</h3>
+                            <p>You haven't placed any orders yet.</p>
+                            <a href="shop.html" class="shop-now-btn">Start Shopping</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                ordersList.innerHTML = filteredOrders.map(order => `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <div class="order-info-item">
+                                    <i class="fa-solid fa-hashtag"></i>
+                                    <div>
+                                        <span>Order ID</span><br>
+                                        <span>${order.orderId || order.id}</span>
+                                    </div>
+                                </div>
+                                <div class="order-info-item">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    <div>
+                                        <span>Date</span><br>
+                                        <span>${formatDate(order.date)}</span>
+                                    </div>
+                                </div>
+                                <div class="order-info-item">
+                                    <i class="fa-solid fa-credit-card"></i>
+                                    <div>
+                                        <span>Payment</span><br>
+                                        <span>${order.paymentMethod === 'card' ? 'Master Card' : 'Cash on Delivery'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="order-status ${getStatusClass(order.status)}">${order.status.toUpperCase()}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="order-body">
+                            <div class="order-items">
+                                ${order.items.map(item => `
+                                    <div class="order-item">
+                                        <div class="order-item-image">
+                                            <img src="${item.image || 'https://via.placeholder.com/80'}" alt="${item.name}">
+                                        </div>
+                                        <div class="order-item-details">
+                                            <h4>${item.name}</h4>
+                                            <div class="order-item-meta">
+                                                ${item.size ? `<span>Size: ${item.size}</span>` : ''}
+                                                ${item.color ? `<span>Color: ${item.color}</span>` : ''}
+                                            </div>
+                                        </div>
+                                        <div class="order-item-price">
+                                            <div class="price">$${item.price.toFixed(2)}</div>
+                                            <div class="quantity">Qty: ${item.quantity}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="order-footer">
+                            <div class="order-total">
+                                <span>Total Amount:</span>
+                                <span>$${order.total.toFixed(2)}</span>
+                            </div>
+                            <div class="order-actions">
+                                ${order.status === 'pending' ? `<button class="btn-outline cancel-order" data-order-id="${order.id}">Cancel Order</button>` : ''}
+                                <button class="btn-outline view-details" data-order-id="${order.id}">View Details</button>
+                                ${order.status === 'delivered' ? `<button class="btn-primary buy-again" data-order-id="${order.id}">Buy Again</button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.querySelectorAll('.view-details').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const orderId = btn.dataset.orderId;
+                        showOrderDetails(orderId);
+                    });
+                });
+
+                document.querySelectorAll('.cancel-order').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const orderId = btn.dataset.orderId;
+                        cancelOrder(orderId);
+                    });
+                });
+
+                document.querySelectorAll('.buy-again').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const orderId = btn.dataset.orderId;
+                        buyAgain(orderId);
+                    });
+                });
+            }
+
+            function showOrderDetails(orderId) {
+                const order = orders.find(o => o.id === orderId);
+                if (order) {
+                    alert(`Order Details:\n\nOrder ID: ${order.orderId}\nDate: ${formatDate(order.date)}\nStatus: ${order.status}\nTotal: $${order.total.toFixed(2)}\n\nItems: ${order.items.length} items\nShipping to: ${order.shippingAddress.fullName}, ${order.shippingAddress.address}, ${order.shippingAddress.city}`);
+                }
+            }
+
+            function cancelOrder(orderId) {
+                if (confirm('Are you sure you want to cancel this order?')) {
+                    const orderIndex = orders.findIndex(o => o.id === orderId);
+                    if (orderIndex !== -1) {
+                        orders[orderIndex].status = 'cancelled';
+                        localStorage.setItem('orders', JSON.stringify(orders));
+                        renderOrders();
+                        alert('Order cancelled successfully!');
+                    }
+                }
+            }
+
+            function buyAgain(orderId) {
+                const order = orders.find(o => o.id === orderId);
+                if (order) {
+                    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                    
+                    order.items.forEach(item => {
+                        const cartItem = {
+                            id: Date.now() + Math.random(),
+                            name: item.name,
+                            price: item.price,
+                            quantity: item.quantity,
+                            size: item.size,
+                            color: item.color,
+                            image: item.image
+                        };
+                        cart.push(cartItem);
+                    });
+                    
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartCount();
+                    alert('Items added to cart!');
+                    window.location.href = 'cart.html';
+                }
+            }
+
+            document.querySelectorAll('.order-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.order-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentFilter = tab.dataset.status;
+                    renderOrders();
+                });
+            });
+
+            renderOrders();
+        });
+    </script>
+
+    <script src="/js/constant.js"></script>
+    <script src="/js/modal.js"></script>
+    <script type="module" src="/js/navbar.js"></script>
+    <script src="products.js"></script>
+    <script src="/js/addToCart.js"></script>
+    <script type="module" src="/js/script.js"></script>
+</body>
+</html>
