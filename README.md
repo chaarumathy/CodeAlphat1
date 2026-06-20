@@ -16,7 +16,7 @@ Database	SQLite (via sql.js)
 Auth	express-session + bcryptjs
 Frontend	HTML, CSS, Vanilla JS
 Installation
-git clone https://github.com/Jenim07/CodeAlpha_Simple-e-commerceStore.git
+git clone https://github.com/chaarumathy/CodeAlphat1
 cd CodeAlpha_Simple-e-commerceStore
 npm install
 npm run seed   # populate database with 12 sample products
